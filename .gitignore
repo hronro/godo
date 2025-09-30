@@ -1,0 +1,5 @@
+/godo
+/godo.exe
+/templates/*_templ.go
+/layout/*_templ.go
+/static/style.css

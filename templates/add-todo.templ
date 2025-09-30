@@ -1,0 +1,19 @@
+package templates
+
+templ AddTodo() {
+	<form
+		action="#"
+		class="mt-4"
+		hx-post="/todo"
+		hx-target="#todos"
+		hx-swap="morph:outerHTML"
+		hx-on::after-request="if(event.detail.successful) this.reset()"
+	>
+		<input
+			class="bg-white w-64 border border-transparent rounded px-4 py-2"
+			placeholder="Add a new todo..."
+			autofocus
+			name="text"
+		/>
+	</form>
+}

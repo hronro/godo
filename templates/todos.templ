@@ -1,0 +1,81 @@
+package templates
+
+import (
+	"godo/data"
+	"strconv"
+)
+
+templ Todos(todos []data.Todo) {
+	<ul id="todos" class="mt-4 list-none">
+		for _, todo := range todos {
+			@Todo(todo, false)
+		}
+	</ul>
+}
+
+templ Todo(todo data.Todo, isEditing bool) {
+	<li
+		id={ "/todo/" + strconv.Itoa(todo.Id) }
+		class="todo-item w-72 h-14 text-lg px-4 pl-8 py-2 bg-white rounded shadow mb-2 relative flex justify-between items-center group"
+		if !isEditing {
+			hx-get={ "/todo/" + strconv.Itoa(todo.Id) + "?edit" }
+			hx-trigger="click"
+			hx-target="this"
+			hx-swap="outerHTML"
+		}
+	>
+		if isEditing {
+			<form
+				hx-patch={ "/todo/" + strconv.Itoa(todo.Id) }
+				hx-target="closest li"
+				hx-swap="outerHTML"
+			>
+				<input
+					autofocus
+					class="absolute w-full h-full top-0 left-0 pl-8 pr-4 py-2"
+					name="text"
+					value={ todo.Text }
+					hx-get={ "/todo/" + strconv.Itoa(todo.Id) }
+					hx-trigger="blur, keyup[keyCode==27]"
+					hx-target="closest li"
+				/>
+			</form>
+		} else {
+			<form
+				class="absolute left-1.5 top-0 bottom-0 w-5 h-5 my-auto"
+				hx-patch={ "/todo/" + strconv.Itoa(todo.Id) }
+				hx-target="closest li"
+				hx-swap="morph:outerHTML"
+			>
+				<input
+					type="hidden"
+					name="done"
+					if todo.Done {
+						value="false"
+					} else {
+						value="true"
+					}
+				/>
+				<button
+					class="w-5 h-5 text-green-500 text-xs absolute left-0 top-0 border border-black rounded-full cursor-pointer overflow-hidden"
+					type="submit"
+					hx-on:click="event.stopPropagation()"
+				>
+					if todo.Done {
+						✓
+					}
+				</button>
+			</form>
+			<span>{ todo.Text }</span>
+			<button
+				class="w-9 h-9 border border-transparent rounded-full bg-gray-200 cursor-pointer pointer-events-none opacity-0 transition-opacity duration-700 ease-in-out group-hover:pointer-events-auto group-hover:opacity-100 group-focus:opacity-100"
+				hx-on:click="event.stopPropagation()"
+				hx-delete={ "/todo/" + strconv.Itoa(todo.Id) }
+				hx-target="closest li"
+				hx-swap="delete swap:600ms"
+			>
+				╳
+			</button>
+		}
+	</li>
+}
